@@ -1,0 +1,10 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# IDE
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -20,11 +20,12 @@ class AppWindow:
         self.filter = LogFilter()     
         
         # Data storage
-        self.filtered_entries = []
         self.original_entries = []
+        self.filtered_entries = []
         self.file_paths = []
         self.color_scheme = COLORS
-        self.text_colors = TEXT_COLORS         
+        self.text_colors = TEXT_COLORS
+        self.log_text = None  
         
         # Setup
         self.create_widgets()
@@ -33,8 +34,6 @@ class AppWindow:
         self.setup_styles()
         self.configure_text_tags()
 
-        
-        # Update statistics
         self.update_statistics()
 
     def create_menu_bar(self):
@@ -107,10 +106,7 @@ class AppWindow:
         main_frame = ttk.Frame(self.root)
         main_frame.pack(fill=tk.BOTH, expand=True, padx=1, pady=1)
         
-        # Configure grid weights - using pack for simplicity
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-        
+        # Toolbar
         toolbar_frame = ttk.Frame(main_frame, relief=tk.RAISED, borderwidth=1)
         toolbar_frame.pack(side=tk.TOP, fill=tk.X, padx=1, pady=(1, 3))
         
@@ -136,23 +132,23 @@ class AppWindow:
         
         ttk.Separator(toolbar_frame, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=10, fill=tk.Y)
         
-        # Time Filter in Toolbar
+        # Timestamp Filter in Toolbar
         ttk.Label(toolbar_frame, text="Timestamp:   From ").pack(side=tk.LEFT, padx=(0, 2))
         self.time_from_var = tk.StringVar()
         self.time_from_entry = ttk.Entry(toolbar_frame, textvariable=self.time_from_var, width=18)
         self.time_from_entry.pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_frame, text="⟳", width=2, command=lambda: self.apply_filters()).pack(side=tk.LEFT, padx=(0, 10))
         
-        ttk.Label(toolbar_frame, text="To ").pack(side=tk.LEFT, padx=(0, 2))
+        ttk.Label(toolbar_frame, text="  To ").pack(side=tk.LEFT, padx=(0, 2))
         self.time_to_var = tk.StringVar()
         self.time_to_entry = ttk.Entry(toolbar_frame, textvariable=self.time_to_var, width=18)
         self.time_to_entry.pack(side=tk.LEFT, padx=2)
-        ttk.Button(toolbar_frame, text="⟳", width=2, command=lambda: self.apply_filters()).pack(side=tk.LEFT, padx=(0, 10))
+
+        ttk.Button(toolbar_frame, text="Apply", width=6, command=lambda: self.apply_filters()).pack(side=tk.LEFT, padx=(0, 10))
 
         ttk.Separator(toolbar_frame, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=10, fill=tk.Y)
         
         # Text Search in Toolbar
-        ttk.Label(toolbar_frame, text="Search:").pack(side=tk.LEFT, padx=(0, 2))
+        ttk.Label(toolbar_frame, text="Text:").pack(side=tk.LEFT, padx=(0, 2))
         self.search_var = tk.StringVar()
         self.search_entry = ttk.Entry(toolbar_frame, textvariable=self.search_var, width=25)
         self.search_entry.pack(side=tk.LEFT, padx=2)
@@ -221,7 +217,6 @@ class AppWindow:
         status_right_label.pack(side=tk.RIGHT, fill=tk.X, expand=True)
     
     def open_files(self):
-        self.close_files()
         files = filedialog.askopenfilenames(
             title="Select log files",
             filetypes=[
@@ -230,15 +225,16 @@ class AppWindow:
             ]
         )
         if files:
+            self.close_files()
             for file in files:
                 if file not in self.file_paths:
                     self.file_paths.append(file)
             self.load_logs()
     
     def open_folder(self):
-        self.close_files()
         folder = filedialog.askdirectory(title="Select folder with log files")
         if folder:
+            self.close_files()
             log_files = glob.glob(os.path.join(folder, "*.trc")) + \
                         glob.glob(os.path.join(folder, "*.log")) + \
                         glob.glob(os.path.join(folder, "*.txt"))
@@ -309,7 +305,6 @@ class AppWindow:
         self.update_statistics()
 
     def clear_all_filters(self):
-        """Clear all filter controls"""
         # Clear level checkboxes
         for level in self.level_vars:
             self.level_vars[level].set(True)
@@ -396,7 +391,6 @@ class AppWindow:
                 messagebox.showerror("Export Error", f"Error exporting JSON: {str(e)}")
     
     def copy_selected(self, event=None):
-        """Copy selected text to clipboard - updated for context menu"""
         try:
             # Check if there's a selection in the text widget
             if self.log_text.tag_ranges("sel"):

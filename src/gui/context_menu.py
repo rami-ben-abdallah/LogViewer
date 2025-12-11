@@ -4,11 +4,7 @@ class ContextMenuManager:
     def __init__(self, app_window):
         self.app = app_window
         self.log_text = app_window.log_text
-        
-        # Create menus
         self.context_menu = None
-
-        # Highlighting state
         self.highlight_colors = [
             ('Yellow', 'yellow'),
             ('Green', 'lightgreen'),
@@ -17,8 +13,6 @@ class ContextMenuManager:
             ('Orange', 'orange')
         ]
         self.current_highlight_tag = None
-        
-        # Setup all bindings
         self.setup_all()
     
     def setup_all(self):
@@ -93,23 +87,11 @@ class ContextMenuManager:
         self.log_text.bind("<Control-a>", lambda e: self.select_all())
         self.log_text.bind("<Control-A>", lambda e: self.select_all())        
         
-        # Make text widget focusable on click
-        self.log_text.bind("<Button-1>", lambda e: self.log_text.focus_set())
-        
-        # Global application shortcuts
-        self.app.root.bind("<Control-o>", lambda e: self.app.add_files())
-        self.app.root.bind("<Control-O>", lambda e: self.app.add_files())
-        self.app.root.bind("<Control-l>", lambda e: self.app.load_logs())
-        self.app.root.bind("<Control-L>", lambda e: self.app.load_logs())
-        
         # If you have a filter focus shortcut
         self.app.root.bind("<Control-f>", self.focus_search_filter)
         self.app.root.bind("<Control-F>", self.focus_search_filter)
     
-    # ===== CONTEXT MENU HANDLERS =====
-    
     def show_context_menu(self, event):
-        """Display context menu at cursor position"""
         try:
             # Only show if there's text selected
             if self.log_text.tag_ranges("sel"):
@@ -122,7 +104,6 @@ class ContextMenuManager:
                 self.context_menu.grab_release()
     
     def show_no_selection_menu(self, event):
-        """Show context menu when no text is selected"""
         no_selection_menu = tk.Menu(self.log_text, tearoff=0)
         no_selection_menu.add_command(
             label="Select All", 
@@ -131,28 +112,22 @@ class ContextMenuManager:
         no_selection_menu.tk_popup(event.x_root, event.y_root)
         no_selection_menu.grab_release()
     
-    # ===== ACTION METHODS =====
-    
     def handle_copy(self, event=None):
-        """Handle copy with keyboard shortcut"""
         self.app.copy_selected()
         return "break"  # Prevent default behavior
     
     def select_all(self):
-        """Select all text in the widget"""
         self.log_text.tag_add('sel', '1.0', 'end')
         self.log_text.mark_set(tk.INSERT, '1.0')
         self.log_text.see('1.0')
     
     def focus_search_filter(self, event=None):
-        """Set focus to the search filter entry"""
         if hasattr(self.app, 'search_entry'):
             self.app.search_entry.focus_set()
             self.app.search_entry.select_range(0, tk.END)
         return "break"
 
     def highlight_selected(self, color="yellow"):
-        """Highlight the currently selected text"""
         if not self.log_text.tag_ranges("sel"):
             self.app.status_left.set("No text selected to highlight")
             return
@@ -177,7 +152,6 @@ class ContextMenuManager:
         self.log_text.tag_remove("sel", "1.0", "end")
     
     def highlight_with_custom_color(self):
-        """Open color picker for custom highlight color"""
         # Simple color dialog
         from tkinter import colorchooser
         
@@ -190,7 +164,6 @@ class ContextMenuManager:
             self.highlight_selected(color[1])
     
     def clear_highlight(self):
-        """Remove highlight from currently selected text"""
         if not self.log_text.tag_ranges("sel"):
             self.app.status_left.set("Select text to clear highlight")
             return
@@ -220,7 +193,6 @@ class ContextMenuManager:
             self.app.status_left.set("No highlights in selection")
     
     def clear_all_highlights(self):
-        """Remove all highlights from the entire document"""
         # Find all highlight tags
         all_tags = self.log_text.tag_names()
         highlight_tags = [t for t in all_tags if t.startswith("highlight_")]
@@ -232,7 +204,6 @@ class ContextMenuManager:
         self.app.status_left.set(f"Cleared all highlights ({len(highlight_tags)} removed)")
     
     def get_all_highlights(self):
-        """Return information about all highlights in the document"""
         highlights = []
         all_tags = self.log_text.tag_names()
         highlight_tags = [t for t in all_tags if t.startswith("highlight_")]

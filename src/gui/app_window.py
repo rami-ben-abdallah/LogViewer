@@ -13,8 +13,11 @@ from gui.context_menu import ContextMenuManager
 class AppWindow:
     def __init__(self, root):
         self.root = root
-        self.root.state('zoomed')
         self.root.title("Log Viewer")
+        try:
+            self.root.state('zoomed')
+        except:
+            self.root.attributes('-zoomed', True)
 
         self.parser = LogParser()
         self.filter = LogFilter()     

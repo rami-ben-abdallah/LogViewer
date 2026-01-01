@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, PhotoImage
 import glob
 from datetime import datetime
 from collections import Counter
@@ -14,6 +14,8 @@ class AppWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Log Viewer")
+        self.root.after(100, self.set_icon)
+
         try:
             self.root.state('zoomed')
         except:
@@ -38,6 +40,14 @@ class AppWindow:
         self.configure_text_tags()
 
         self.update_statistics()
+
+    def set_icon(self):
+        try:
+            icon = PhotoImage(file="assets/icon.png")
+            self.root.iconphoto(True, icon)
+            self._icon = icon
+        except Exception as e:
+            print(f"Could not load icon: {e}")        
 
     def create_menu_bar(self):
         menubar = tk.Menu(self.root)

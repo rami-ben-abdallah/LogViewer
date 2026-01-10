@@ -26,6 +26,7 @@ def build_executable():
     pyInstallerCommand = [
         'pyinstaller',
         '--onefile',
+        '--noconsole',
         '--name', 'LogViewer',
         '--icon', 'assets/icon.png',
         '--add-data', f'assets{os.pathsep}assets',

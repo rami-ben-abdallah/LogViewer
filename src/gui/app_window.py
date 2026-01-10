@@ -9,6 +9,7 @@ from core.log_filter import LogFilter
 from core.log_parser import LogParser
 from gui.styles import *
 from gui.context_menu import ContextMenuManager
+from gui.icon_loader import IconLoader
 
 class AppWindow:
     def __init__(self, root):
@@ -42,12 +43,8 @@ class AppWindow:
         self.update_statistics()
 
     def set_icon(self):
-        try:
-            icon = PhotoImage(file="assets/icon.png")
-            self.root.iconphoto(True, icon)
-            self._icon = icon
-        except Exception as e:
-            print(f"Could not load icon: {e}")        
+        icon_loader = IconLoader()
+        self._icon = icon_loader.set_application_icon(self.root)    
 
     def create_menu_bar(self):
         menubar = tk.Menu(self.root)

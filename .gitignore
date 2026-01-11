@@ -1,10 +1,25 @@
-# Python bytecode
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Virtual environments
+venv/
+.venv/
+env/
 
 # IDE
 .vscode/
+.idea/
+*.swp
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini

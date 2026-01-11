@@ -46,13 +46,6 @@ def build_executable():
     result = subprocess.run(pyInstallerCommand)
     return result.returncode
 
-if __name__ == '__main__':
-    # Install PyInstaller if not present
-    try:
-        import PyInstaller
-    except ImportError:
-        print("Installing PyInstaller...")
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pyinstaller'])
-    
+if __name__ == '__main__':  
     exit_code = build_executable()
     sys.exit(exit_code)

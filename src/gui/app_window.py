@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, PhotoImage
 import glob
 from datetime import datetime
 from collections import Counter
@@ -9,11 +9,14 @@ from core.log_filter import LogFilter
 from core.log_parser import LogParser
 from gui.styles import *
 from gui.context_menu import ContextMenuManager
+from gui.icon_loader import IconLoader
 
 class AppWindow:
     def __init__(self, root):
         self.root = root
         self.root.title("Log Viewer")
+        self.root.after(100, self.set_icon)
+
         try:
             self.root.state('zoomed')
         except:
@@ -38,6 +41,10 @@ class AppWindow:
         self.configure_text_tags()
 
         self.update_statistics()
+
+    def set_icon(self):
+        icon_loader = IconLoader()
+        self._icon = icon_loader.set_application_icon(self.root)    
 
     def create_menu_bar(self):
         menubar = tk.Menu(self.root)
